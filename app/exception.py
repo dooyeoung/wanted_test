@@ -1,6 +1,10 @@
-class DuplicatedNameException(Exception):
+class DuplicatedName(Exception):
     pass
 
 
-class DuplicatedTagException(Exception):
+class DuplicatedTag(Exception):
+    pass
+
+
+class NotFoundCompany(Exception):
     pass

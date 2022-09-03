@@ -5,7 +5,7 @@ from app.repository.commany import CompanyRepository
 from app.orm import session_scope
 from app.model.company import Company, CompanyName, CompanyTag
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
-from app.exception import DuplicatedNameException
+from app.exception import DuplicatedName, NotFoundCompany
 
 
 class CompanyService:
@@ -14,13 +14,18 @@ class CompanyService:
         company_repository: CompanyRepository,
         sessionmaker,
     ):
-        self.url_repository = company_repository
+        self.company_repository = company_repository
         self.sessionmaker = sessionmaker
 
     def get_all(self):
         with session_scope(self.sessionmaker) as session:
             companies = session.query(Company).all()
-            return companies
+            datas = []
+            for company in companies:
+                data = self._serialize_company(company)
+                data["uuid"] = str(company.uuid)
+                datas.append(data)
+            return datas
 
     def is_name_exists(self, name, language) -> bool:
         with session_scope(self.sessionmaker) as session:
@@ -34,13 +39,21 @@ class CompanyService:
                 is not None
             )
 
+    def _serialize_company(self, company: Company):
+        company_data = defaultdict(dict)
+        for name in company.names:
+            company_data[name.language]["company_name"] = name.name
+            company_data[name.language]["tags"] = []
+
+        for tag in company.tags:
+            company_data[tag.language]["tags"].append(tag.name)
+        return company_data
+
     def add_commany(
         self,
         names: List[CompanyNameDTO],
         tags: List[CompanyTagDTO],
-    ):
-        language_company_data = defaultdict(dict)
-
+    ) -> dict:
         with session_scope(self.sessionmaker) as session:
             company = Company()
             session.add(company)
@@ -50,20 +63,54 @@ class CompanyService:
                     name=name_dto.name,
                     language=name_dto.language,
                 ):
-                    raise DuplicatedNameException(name_dto)
+                    raise DuplicatedName(name_dto)
 
                 company_name = CompanyName(
                     company=company, language=name_dto.language, name=name_dto.name
                 )
                 session.add(company_name)
-                language_company_data[name_dto.language]["company_name"] = name_dto.name
-                language_company_data[name_dto.language]["tags"] = []
 
             for tag_dto in tags:
                 company_tag = CompanyTag(
                     company=company, language=tag_dto.language, name=tag_dto.name
                 )
                 session.add(company_tag)
-                language_company_data[tag_dto.language]["tags"].append(tag_dto.name)
+
+            language_company_data = self._serialize_company(company)
+            return language_company_data
+
+    def get_commany_by_name(
+        self,
+        name: str,
+    ):
+        with session_scope(self.sessionmaker) as session:
+            company_name = self.company_repository.get_commany_name_by_name(
+                session=session,
+                name=name,
+            )
+
+            if not company_name:
+                raise NotFoundCompany(name)
+
+            company = company_name.company
+            language_company_data = self._serialize_company(company)
 
             return language_company_data
+
+    def search_commany_by_query(
+        self,
+        query: str,
+        language: str,
+    ):
+        with session_scope(self.sessionmaker) as session:
+            company_names = self.company_repository.search_commany_names_by_query(
+                session=session,
+                query=query,
+                language=language,
+            )
+            if not company_names:
+                raise NotFoundCompany(query)
+
+            return [
+                {"company_name": company_name.name} for company_name in company_names
+            ]
