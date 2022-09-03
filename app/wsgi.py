@@ -21,7 +21,7 @@ def create_wsgi_app() -> Flask:
     app.config["API_TITLE"] = "wanted search API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.2"
-    app.secret_key = "jose"
+    app.secret_key = "__WANTED__"
     api = Api(app)
     api.register_blueprint(company_api)
 
