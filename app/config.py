@@ -8,6 +8,7 @@ class ProductionConfig(Config):
     TESTING = False
     DATABASE = {"url": "sqlite:///company.sqlite"}
 
+
 class TestConfig(Config):
     DEBUG = False
     TESTING = False
