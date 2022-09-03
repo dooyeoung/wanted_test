@@ -3,7 +3,7 @@ from typing import Optional, Sequence
 
 from sqlalchemy.orm.session import Session
 
-from app.model.company import CompanyName
+from app.model.company import Company, CompanyName, CompanyTag
 
 
 class CompanyRepository(abc.ABC):
@@ -16,6 +16,11 @@ class CompanyRepository(abc.ABC):
     def search_commany_name_by_query(
         self, session: Session, **parameters
     ) -> Sequence[CompanyName]:
+        pass
+
+    def get_commany_tag_by_name_and_tag(
+        self, session: Session, **parameters
+    ) -> Optional[CompanyName]:
         pass
 
 
@@ -40,4 +45,21 @@ class SQLAlchemyCompanyRepository(CompanyRepository):
                 CompanyName.name.like(f"%{query}%"),
             )
             .all()
+        )
+
+    def get_commany_tag_by_name_and_tag(
+        self,
+        session: Session,
+        company_name: str,
+        tag_name: str,
+    ) -> Optional[CompanyTag]:
+        return (
+            session.query(CompanyTag)
+            .join(Company, Company.uuid == CompanyTag.company_uuid)
+            .join(CompanyName, CompanyName.company_uuid == Company.uuid)
+            .filter(
+                CompanyName.name == company_name,
+                CompanyTag.name == tag_name,
+            )
+            .one_or_none()
         )

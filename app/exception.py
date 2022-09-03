@@ -8,3 +8,7 @@ class DuplicatedTag(Exception):
 
 class NotFoundCompany(Exception):
     pass
+
+
+class NotFoundCompanyTag(Exception):
+    pass

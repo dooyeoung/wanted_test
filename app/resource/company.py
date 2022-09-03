@@ -7,13 +7,19 @@ from app.schema.company import (
     NewCompanySchema,
     NewTagSchema,
     CompanyNameSchema,
+    CompanyTagDeleteSchema,
     CompanyQueryArgsSchema,
 )
 from app.orm import database_sessionmaker
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
 from app.service.company import CompanyService
 from app.repository.commany import SQLAlchemyCompanyRepository
-from app.exception import DuplicatedName, NotFoundCompany, DuplicatedTag
+from app.exception import (
+    DuplicatedName,
+    NotFoundCompany,
+    DuplicatedTag,
+    NotFoundCompanyTag,
+)
 from flask_smorest import abort
 
 api = Blueprint("company", __name__, url_prefix="/")
@@ -134,5 +140,27 @@ class CompanyTags(MethodView):
         except DuplicatedTag as e:
             tag_name = e.args[0]
             abort(400, message=f"can not found comapny {tag_name}")
+
+        return company_data[response_language]
+
+
+@api.route("/companies/<string:company_name>/tags/<string:tag_name>")
+class CompanyTagByName(MethodView):
+    @api.arguments(schema=CompanyTagDeleteSchema, location="path", as_kwargs=True)
+    def delete(self, company_name, tag_name):
+        response_language = request.headers.get("X-Wanted-Language")
+
+        try:
+            service = CompanyService(
+                company_repository=SQLAlchemyCompanyRepository(),
+                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
+            )
+            company_data = service.delete_company_tag(
+                company_name=company_name,
+                tag_name=tag_name,
+            )
+        except NotFoundCompanyTag as e:
+            tag_name = e.args[0]
+            abort(400, message=f"not found tag {tag_name} of {company_name}")
 
         return company_data[response_language]
