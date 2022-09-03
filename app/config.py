@@ -6,4 +6,9 @@ class Config(object):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
-    DATABASE = {"url": "sqlite:///company.db"}
+    DATABASE = {"url": "sqlite:///company.sqlite"}
+
+class TestConfig(Config):
+    DEBUG = False
+    TESTING = False
+    DATABASE = {"url": "sqlite:///test.sqlite"}
