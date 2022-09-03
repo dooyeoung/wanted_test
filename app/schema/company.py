@@ -23,3 +23,8 @@ class CompanyQueryArgsSchema(Schema):
 
 class NewTagSchema(Schema):
     tag_name = fields.Dict(keys=fields.Str(), values=fields.Str(), required=True)
+
+
+class CompanyTagDeleteSchema(Schema):
+    company_name = fields.Str(required=True)
+    tag_name = fields.Str(required=True)
