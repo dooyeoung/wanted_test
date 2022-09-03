@@ -1,6 +1,6 @@
-from flask import current_app, request
+from flask import request
 from flask.views import MethodView
-from flask_smorest import Blueprint
+from flask_smorest import Blueprint, abort
 
 from app.schema.company import (
     CompanySchema,
@@ -10,17 +10,14 @@ from app.schema.company import (
     CompanyTagDeleteSchema,
     CompanyQueryArgsSchema,
 )
-from app.orm import database_sessionmaker
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
-from app.service.company import CompanyService
-from app.repository.commany import SQLAlchemyCompanyRepository
 from app.exception import (
     DuplicatedName,
     NotFoundCompany,
     DuplicatedTag,
     NotFoundCompanyTag,
 )
-from flask_smorest import abort
+from app.components import company_service
 
 api = Blueprint("company", __name__, url_prefix="/")
 
@@ -28,11 +25,7 @@ api = Blueprint("company", __name__, url_prefix="/")
 @api.route("/companies")
 class Companies(MethodView):
     def get(self):
-        service = CompanyService(
-            company_repository=SQLAlchemyCompanyRepository(),
-            sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-        )
-        companies = service.get_all()
+        companies = company_service().get_all()
         return companies
 
     @api.arguments(schema=NewCompanySchema)
@@ -52,11 +45,7 @@ class Companies(MethodView):
                 company_tags.append(CompanyTagDTO(language=language, name=name))
 
         try:
-            service = CompanyService(
-                company_repository=SQLAlchemyCompanyRepository(),
-                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-            )
-            company_data = service.add_commany(
+            company_data = company_service().add_commany(
                 names=company_names,
                 tags=company_tags,
             )
@@ -78,22 +67,14 @@ class CompaniesByname(MethodView):
         response_language = request.headers.get("X-Wanted-Language")
         company_name = path_parameter["company_name"]
         try:
-            service = CompanyService(
-                company_repository=SQLAlchemyCompanyRepository(),
-                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-            )
-            company_data = service.get_commany_by_name(name=company_name)
+            company_data = company_service().get_commany_by_name(name=company_name)
         except NotFoundCompany:
             abort(400, message=f"can not found comapny {company_name}")
         return company_data[response_language]
 
     @api.response(200)
     def delete(self, company_name):
-        service = CompanyService(
-            company_repository=SQLAlchemyCompanyRepository(),
-            sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-        )
-        service.delete_company_by_name(name=company_name)
+        company_service().delete_company_by_name(name=company_name)
         return {"result": "success"}
 
 
@@ -104,11 +85,7 @@ class SearchCompanies(MethodView):
         language = request.headers.get("X-Wanted-Language")
         query = query_args["query"]
         try:
-            service = CompanyService(
-                company_repository=SQLAlchemyCompanyRepository(),
-                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-            )
-            company_names = service.search_commany_by_query(
+            company_names = company_service().search_commany_by_query(
                 query=query,
                 language=language,
             )
@@ -129,11 +106,7 @@ class CompanyTags(MethodView):
             for language, name in tag["tag_name"].items():
                 company_tags.append(CompanyTagDTO(language=language, name=name))
         try:
-            service = CompanyService(
-                company_repository=SQLAlchemyCompanyRepository(),
-                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-            )
-            company_data = service.add_company_tags(
+            company_data = company_service().add_company_tags(
                 company_name=company_name,
                 tags=company_tags,
             )
@@ -149,13 +122,8 @@ class CompanyTagByName(MethodView):
     @api.arguments(schema=CompanyTagDeleteSchema, location="path", as_kwargs=True)
     def delete(self, company_name, tag_name):
         response_language = request.headers.get("X-Wanted-Language")
-
         try:
-            service = CompanyService(
-                company_repository=SQLAlchemyCompanyRepository(),
-                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
-            )
-            company_data = service.delete_company_tag(
+            company_data = company_service().delete_company_tag(
                 company_name=company_name,
                 tag_name=tag_name,
             )
