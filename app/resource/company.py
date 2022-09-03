@@ -1,43 +1,50 @@
-from flask import current_app
+from flask import current_app, request
 from flask.views import MethodView
 from flask_smorest import Blueprint
 
-from app.schema.company import CompanySchema
-from app.orm import session_scope, database_sessionmaker
-from app.model.company import Company
+from app.schema.company import CompanySchema, NewCompanySchema
+from app.orm import database_sessionmaker
+from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
+from app.service.company import CompanyService
+from app.repository.commany import SQLAlchemyCompanyRepository
+from app.exception import DuplicatedNameException
+from flask_smorest import abort
 
-api = Blueprint("company", __name__, url_prefix="/company")
-
-
-
-# companies
-# tags
-# search
+api = Blueprint("company", __name__, url_prefix="/")
 
 
-@api.route("/")
-class SearchCompany(MethodView):
-    @api.response(
-        200,
-        CompanySchema(many=True),
-        example={
-            "source_url": "https://naver.com",
-            "id": 1,
-            "short_id": "dddddL",
-        },
-    )
-    def get(self):
-        """/
+@api.route("/companies")
+class Companies(MethodView):
+    @api.arguments(schema=NewCompanySchema)
+    @api.response(200, CompanySchema)
+    def post(self, new_company):
+        response_language = request.headers.get("X-Wanted-Language")
+        names = new_company["company_name"]
+        tags = new_company["tags"]
 
-        단축 Url 조회
-        ---
-        """
-        app_config = current_app.config
-        sessionmaker=database_sessionmaker(
-            app_config["DATABASE"]
-        )
+        company_names = []
+        for language, name in names.items():
+            company_names.append(CompanyNameDTO(language=language, name=name))
 
-        with session_scope(sessionmaker) as session:
-            session.query(Company).all()
-        datas = []
-        return datas
+        company_tags = []
+        for tag in tags:
+            for language, name in tag["tag_name"].items():
+                company_tags.append(CompanyTagDTO(language=language, name=name))
+
+        try:
+            service = CompanyService(
+                company_repository=SQLAlchemyCompanyRepository(),
+                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
+            )
+            company_data = service.add_commany(
+                names=company_names,
+                tags=company_tags,
+            )
+        except DuplicatedNameException as e:
+            exception_data = e.args[0]
+            abort(
+                400,
+                message=f"company name {exception_data.language}-{exception_data.name} is duplicated",  # noqa
+            )
+
+        return company_data[response_language]
