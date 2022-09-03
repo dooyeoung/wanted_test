@@ -5,7 +5,12 @@ from app.repository.commany import CompanyRepository
 from app.orm import session_scope
 from app.model.company import Company, CompanyName, CompanyTag
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
-from app.exception import DuplicatedName, NotFoundCompany, DuplicatedTag
+from app.exception import (
+    DuplicatedName,
+    NotFoundCompany,
+    DuplicatedTag,
+    NotFoundCompanyTag,
+)
 
 
 class CompanyService:
@@ -156,4 +161,18 @@ class CompanyService:
                 company.tags.append(tag)
                 session.add(tag)
 
+            return self._serialize_company(company=company)
+
+    def delete_company_tag(self, company_name: str, tag_name: str) -> dict:
+        with session_scope(self.sessionmaker) as session:
+            company_tag = self.company_repository.get_commany_tag_by_name_and_tag(
+                session=session,
+                company_name=company_name,
+                tag_name=tag_name,
+            )
+            if not company_tag:
+                raise NotFoundCompanyTag(tag_name)
+
+            company = company_tag.company
+            session.delete(company_tag)
             return self._serialize_company(company=company)
