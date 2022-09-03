@@ -12,7 +12,7 @@ from app.orm import database_sessionmaker
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
 from app.service.company import CompanyService
 from app.repository.commany import SQLAlchemyCompanyRepository
-from app.exception import DuplicatedNameException, NotFoundCompany
+from app.exception import DuplicatedName, NotFoundCompany
 from flask_smorest import abort
 
 api = Blueprint("company", __name__, url_prefix="/")
@@ -53,7 +53,7 @@ class Companies(MethodView):
                 names=company_names,
                 tags=company_tags,
             )
-        except DuplicatedNameException as e:
+        except DuplicatedName as e:
             exception_data = e.args[0]
             abort(
                 400,

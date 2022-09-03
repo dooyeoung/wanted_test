@@ -5,7 +5,7 @@ from app.repository.commany import CompanyRepository
 from app.orm import session_scope
 from app.model.company import Company, CompanyName, CompanyTag
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
-from app.exception import DuplicatedNameException, NotFoundCompany
+from app.exception import DuplicatedName, NotFoundCompany
 
 
 class CompanyService:
@@ -63,7 +63,7 @@ class CompanyService:
                     name=name_dto.name,
                     language=name_dto.language,
                 ):
-                    raise DuplicatedNameException(name_dto)
+                    raise DuplicatedName(name_dto)
 
                 company_name = CompanyName(
                     company=company, language=name_dto.language, name=name_dto.name
