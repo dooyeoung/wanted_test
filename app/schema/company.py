@@ -2,5 +2,12 @@ from marshmallow import Schema, fields
 
 
 class CompanySchema(Schema):
-    uuid = fields.UUID(required=True)
-    created_at = fields.Str(required=True)
+    company_name = fields.Str(required=True)
+    tags = fields.List(fields.Str, required=True)
+
+
+class NewCompanySchema(Schema):
+    company_name = fields.Dict(keys=fields.Str(), values=fields.Str(), required=True)
+    tags = fields.List(
+        fields.Dict(keys=fields.Str(), values=fields.Dict()), required=True
+    )
