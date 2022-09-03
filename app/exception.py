@@ -4,3 +4,7 @@ class DuplicatedNameException(Exception):
 
 class DuplicatedTagException(Exception):
     pass
+
+
+class NotFoundCompany(Exception):
+    pass
