@@ -1,12 +1,17 @@
 import pytest
 import json
 
-from app import app
+from app.wsgi import create_wsgi_app
 
 
 @pytest.fixture
-def api():
-    return app.test_client()
+def fx_wsgi_app():
+    return create_wsgi_app("test")
+
+
+@pytest.fixture
+def api(fx_wsgi_app):
+    return fx_wsgi_app.test_client()
 
 
 def test_company_name_autocomplete(api):

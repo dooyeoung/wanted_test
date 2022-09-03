@@ -15,7 +15,7 @@ def ping():
     )
 
 
-def create_wsgi_app() -> Flask:
+def create_wsgi_app(env) -> Flask:
     app = Flask(__name__)
     app.route("/ping/")(ping)
     app.config["API_TITLE"] = "wanted search API"
@@ -24,5 +24,10 @@ def create_wsgi_app() -> Flask:
     app.secret_key = "__WANTED__"
     api = Api(app)
     api.register_blueprint(company_api)
+
+    if env == "prod":
+        app.config.from_object("app.config.ProductionConfig")
+    elif env == "test":
+        app.config.from_object("app.config.TestConfig")
 
     return app
