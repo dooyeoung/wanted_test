@@ -34,6 +34,9 @@ class CompanyName(Base):
         ),
     )
 
+    def __repr__(self) -> str:
+        return f"{str(self.uuid), str(self.company_uuid), self.name, self.language}"
+
 
 class CompanyTag(Base):
     __tablename__ = "company_tag"
@@ -49,3 +52,6 @@ class CompanyTag(Base):
             columns=["company_uuid"], refcolumns=[Company.uuid], ondelete="cascade"
         ),
     )
+
+    def __repr__(self) -> str:
+        return f"{str(self.uuid), str(self.company_uuid), self.name, self.language}"
