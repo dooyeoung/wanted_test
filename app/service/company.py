@@ -65,16 +65,14 @@ class CompanyService:
                 ):
                     raise DuplicatedName(name_dto)
 
-                company_name = CompanyName(
-                    company=company, language=name_dto.language, name=name_dto.name
+                company.names.append(
+                    CompanyName(language=name_dto.language, name=name_dto.name)
                 )
-                session.add(company_name)
 
             for tag_dto in tags:
-                company_tag = CompanyTag(
-                    company=company, language=tag_dto.language, name=tag_dto.name
+                company.tags.append(
+                    CompanyTag(language=tag_dto.language, name=tag_dto.name)
                 )
-                session.add(company_tag)
 
             language_company_data = self._serialize_company(company)
             return language_company_data
@@ -114,3 +112,13 @@ class CompanyService:
             return [
                 {"company_name": company_name.name} for company_name in company_names
             ]
+
+    def delete_company_by_name(self, name: str):
+        with session_scope(self.sessionmaker) as session:
+            company_name = self.company_repository.get_commany_name_by_name(
+                session=session,
+                name=name,
+            )
+            if company_name:
+                company = company_name.company
+                session.delete(company)

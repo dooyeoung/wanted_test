@@ -80,6 +80,15 @@ class CompaniesByname(MethodView):
             abort(400, message=f"can not found comapny {company_name}")
         return company_data[response_language]
 
+    @api.response(200)
+    def delete(self, company_name):
+        service = CompanyService(
+            company_repository=SQLAlchemyCompanyRepository(),
+            sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
+        )
+        service.delete_company_by_name(name=company_name)
+        return {"result": "success"}
+
 
 @api.route("/search")
 class SearchCompanies(MethodView):
