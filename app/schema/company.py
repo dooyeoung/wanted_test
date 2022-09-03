@@ -19,3 +19,7 @@ class CompanyNameSchema(Schema):
 
 class CompanyQueryArgsSchema(Schema):
     query = fields.Str(required=True)
+
+
+class NewTagSchema(Schema):
+    tag_name = fields.Dict(keys=fields.Str(), values=fields.Str(), required=True)

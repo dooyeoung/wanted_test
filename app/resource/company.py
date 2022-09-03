@@ -5,6 +5,7 @@ from flask_smorest import Blueprint
 from app.schema.company import (
     CompanySchema,
     NewCompanySchema,
+    NewTagSchema,
     CompanyNameSchema,
     CompanyQueryArgsSchema,
 )
@@ -12,7 +13,7 @@ from app.orm import database_sessionmaker
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
 from app.service.company import CompanyService
 from app.repository.commany import SQLAlchemyCompanyRepository
-from app.exception import DuplicatedName, NotFoundCompany
+from app.exception import DuplicatedName, NotFoundCompany, DuplicatedTag
 from flask_smorest import abort
 
 api = Blueprint("company", __name__, url_prefix="/")
@@ -108,3 +109,30 @@ class SearchCompanies(MethodView):
         except NotFoundCompany:
             abort(400, message=f"can not found comapny {query}")
         return company_names
+
+
+@api.route("/companies/<string:company_name>/tags")
+class CompanyTags(MethodView):
+    @api.arguments(schema=NewTagSchema(many=True))
+    @api.arguments(schema=CompanyNameSchema, location="path", as_kwargs=True)
+    def post(self, tags, company_name):
+        response_language = request.headers.get("X-Wanted-Language")
+
+        company_tags = []
+        for tag in tags:
+            for language, name in tag["tag_name"].items():
+                company_tags.append(CompanyTagDTO(language=language, name=name))
+        try:
+            service = CompanyService(
+                company_repository=SQLAlchemyCompanyRepository(),
+                sessionmaker=database_sessionmaker(current_app.config["DATABASE"]),
+            )
+            company_data = service.add_company_tags(
+                company_name=company_name,
+                tags=company_tags,
+            )
+        except DuplicatedTag as e:
+            tag_name = e.args[0]
+            abort(400, message=f"can not found comapny {tag_name}")
+
+        return company_data[response_language]

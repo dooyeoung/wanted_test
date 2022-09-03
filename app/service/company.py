@@ -5,7 +5,7 @@ from app.repository.commany import CompanyRepository
 from app.orm import session_scope
 from app.model.company import Company, CompanyName, CompanyTag
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
-from app.exception import DuplicatedName, NotFoundCompany
+from app.exception import DuplicatedName, NotFoundCompany, DuplicatedTag
 
 
 class CompanyService:
@@ -39,13 +39,16 @@ class CompanyService:
                 is not None
             )
 
-    def _serialize_company(self, company: Company):
+    def _serialize_company(self, company: Company) -> dict:
         company_data = defaultdict(dict)
         for name in company.names:
             company_data[name.language]["company_name"] = name.name
             company_data[name.language]["tags"] = []
 
         for tag in company.tags:
+            if not company_data[tag.language]:
+                company_data[tag.language]["tags"] = []
+
             company_data[tag.language]["tags"].append(tag.name)
         return company_data
 
@@ -80,7 +83,7 @@ class CompanyService:
     def get_commany_by_name(
         self,
         name: str,
-    ):
+    ) -> dict:
         with session_scope(self.sessionmaker) as session:
             company_name = self.company_repository.get_commany_name_by_name(
                 session=session,
@@ -99,7 +102,7 @@ class CompanyService:
         self,
         query: str,
         language: str,
-    ):
+    ) -> List[dict]:
         with session_scope(self.sessionmaker) as session:
             company_names = self.company_repository.search_commany_names_by_query(
                 session=session,
@@ -122,3 +125,35 @@ class CompanyService:
             if company_name:
                 company = company_name.company
                 session.delete(company)
+
+    def add_company_tags(
+        self,
+        company_name: str,
+        tags: List[CompanyTagDTO],
+    ) -> dict:
+        with session_scope(self.sessionmaker) as session:
+            company_name = self.company_repository.get_commany_name_by_name(
+                session=session,
+                name=company_name,
+            )
+            if not company_name:
+                raise NotFoundCompany(company_name)
+
+            company = company_name.company
+            company_tags = company.tags
+            for tag_dto in tags:
+                if list(
+                    filter(
+                        lambda x: (
+                            x.name == tag_dto.name and x.language == tag_dto.language
+                        ),
+                        company_tags,
+                    )
+                ):
+                    raise DuplicatedTag(tag_dto.name)
+
+                tag = CompanyTag(language=tag_dto.language, name=tag_dto.name)
+                company.tags.append(tag)
+                session.add(tag)
+
+            return self._serialize_company(company=company)
