@@ -65,14 +65,14 @@ class CompanyService:
                 ):
                     raise DuplicatedName(name_dto)
 
-                company.names.append(
-                    CompanyName(language=name_dto.language, name=name_dto.name)
-                )
+                name = CompanyName(language=name_dto.language, name=name_dto.name)
+                company.names.append(name)
+                session.add(name)
 
             for tag_dto in tags:
-                company.tags.append(
-                    CompanyTag(language=tag_dto.language, name=tag_dto.name)
-                )
+                tag = CompanyTag(language=tag_dto.language, name=tag_dto.name)
+                company.tags.append(tag)
+                session.add(tag)
 
             language_company_data = self._serialize_company(company)
             return language_company_data
