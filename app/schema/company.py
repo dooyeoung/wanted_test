@@ -11,3 +11,11 @@ class NewCompanySchema(Schema):
     tags = fields.List(
         fields.Dict(keys=fields.Str(), values=fields.Dict()), required=True
     )
+
+
+class CompanyNameSchema(Schema):
+    company_name = fields.Str(required=True)
+
+
+class CompanyQueryArgsSchema(Schema):
+    query = fields.Str(required=True)
