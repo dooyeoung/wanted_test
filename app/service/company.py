@@ -104,23 +104,22 @@ class CompanyService:
             company = company_name.company
             return self._serialize_company(company)
 
-    def search_commany_by_query(
+    def get_commanies_by_name_query(
         self,
         query: str,
-        language: str,
     ) -> List[dict]:
         with session_scope(self.sessionmaker) as session:
-            company_names = self.company_repository.search_commany_names_by_query(
+            company_names = self.company_repository.get_commanies_by_name_query(
                 session=session,
                 query=query,
-                language=language,
             )
             if not company_names:
                 raise NotFoundCompany(query)
 
-            return [
-                {"company_name": company_name.name} for company_name in company_names
-            ]
+            result = defaultdict(list)
+            for company_name in company_names:
+                result[company_name.language].append(company_name.name)
+            return result
 
     def delete_company_by_name(self, name: str):
         with session_scope(self.sessionmaker) as session:
@@ -187,3 +186,20 @@ class CompanyService:
 
                 session.delete(tag)
             return self._serialize_company(company=company)
+
+    def get_commanies_by_tag(
+        self,
+        tag_name: str,
+    ) -> List[dict]:
+        with session_scope(self.sessionmaker) as session:
+            company_names = self.company_repository.get_commanies_by_tag(
+                session=session,
+                tag_name=tag_name,
+            )
+            if not company_names:
+                raise NotFoundCompany(tag_name)
+
+            result = defaultdict(list)
+            for company_name in company_names:
+                result[company_name.language].append(company_name.name)
+            return result
