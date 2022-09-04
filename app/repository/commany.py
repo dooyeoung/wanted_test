@@ -18,7 +18,7 @@ class CompanyRepository(abc.ABC):
     ) -> Sequence[CompanyName]:
         pass
 
-    def get_commany_tag_by_name_and_tag(
+    def get_commany_tag_group_by_name_and_tag(
         self, session: Session, **parameters
     ) -> Optional[CompanyName]:
         pass
@@ -47,19 +47,31 @@ class SQLAlchemyCompanyRepository(CompanyRepository):
             .all()
         )
 
-    def get_commany_tag_by_name_and_tag(
+    def get_commany_tag_group_by_name_and_tag(
         self,
         session: Session,
         company_name: str,
         tag_name: str,
     ) -> Optional[CompanyTag]:
-        return (
-            session.query(CompanyTag)
+        company_tag = (
+            session.query(
+                CompanyTag.group_id,
+                CompanyTag.company_uuid,
+            )
             .join(Company, Company.uuid == CompanyTag.company_uuid)
             .join(CompanyName, CompanyName.company_uuid == Company.uuid)
             .filter(
                 CompanyName.name == company_name,
                 CompanyTag.name == tag_name,
             )
-            .one_or_none()
+            .cte()
+        )
+
+        return (
+            session.query(CompanyTag)
+            .filter(
+                CompanyTag.group_id == company_tag.c.group_id,
+                CompanyTag.company_uuid == company_tag.c.company_uuid,
+            )
+            .all()
         )
