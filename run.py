@@ -10,14 +10,18 @@ parser.add_argument(
 parser.add_argument("-e", "--env", default="dev")
 
 
+def _create_wsgi_app(env):
+    wsgi_app = create_wsgi_app()
+    if env == "prod":
+        wsgi_app.config.from_object("app.config.ProductionConfig")
+    elif env == "test":
+        wsgi_app.config.from_object("app.config.TestConfig")
+    return wsgi_app
+
+
 def main():
     args = parser.parse_args()
-    wsgi_app = create_wsgi_app()
-
-    if args.env == "prod":
-        wsgi_app.config.from_object("app.config.ProductionConfig")
-    elif args.env == "test":
-        wsgi_app.config.from_object("app.config.TestConfig")
+    wsgi_app = _create_wsgi_app(args.env)
 
     wsgi_app.run(host=args.host, port=args.port, debug=True)
 
