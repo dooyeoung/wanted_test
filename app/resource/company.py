@@ -146,7 +146,8 @@ class CompanyTagByTag(MethodView):
         try:
             company_names = company_service().get_commanies_by_tag(
                 tag_name=tag_name,
+                response_language=response_language,
             )
         except NotFoundCompany:
             abort(400, message=f"can not found comapny {tag_name}")
-        return company_names[response_language]
+        return company_names

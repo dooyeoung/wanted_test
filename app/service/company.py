@@ -118,7 +118,9 @@ class CompanyService:
 
             result = defaultdict(list)
             for company_name in company_names:
-                result[company_name.language].append(company_name.name)
+                result[company_name.language].append(
+                    {"company_name": company_name.name}
+                )
             return result
 
     def delete_company_by_name(self, name: str):
@@ -190,6 +192,7 @@ class CompanyService:
     def get_commanies_by_tag(
         self,
         tag_name: str,
+        response_language: str,
     ) -> List[dict]:
         with session_scope(self.sessionmaker) as session:
             company_names = self.company_repository.get_commanies_by_tag(
@@ -199,7 +202,26 @@ class CompanyService:
             if not company_names:
                 raise NotFoundCompany(tag_name)
 
-            result = defaultdict(list)
+            # 회사의 여러 이름 중복 노출 금지
+            companies = defaultdict(list)
             for company_name in company_names:
-                result[company_name.language].append(company_name.name)
-            return result
+                companies[str(company_name.company_uuid)].append(
+                    {
+                        "language": company_name.language,
+                        "company_name": company_name.name,
+                    }
+                )
+
+            # 요구한 언어의 이름이 없으면 가능한 언어로
+            company_names = []
+            for names in companies.values():
+                found = next(
+                    filter(lambda name: name["language"] == response_language, names),
+                    None,
+                )
+                if found:
+                    name = found
+                else:
+                    name = names[0]
+                company_names.append({"company_name": name["company_name"]})
+            return company_names
