@@ -6,7 +6,9 @@ from app.wsgi import create_wsgi_app
 
 @pytest.fixture
 def fx_wsgi_app():
-    return create_wsgi_app("test")
+    app = create_wsgi_app()
+    app.config.from_object("app.config.TestConfig")
+    return app
 
 
 @pytest.fixture
@@ -118,6 +120,7 @@ def test_search_tag_name(api):
     resp = api.get("/tags?query=タグ_22", headers=[("x-wanted-language", "ko")])
     searched_companies = json.loads(resp.data.decode("utf-8"))
 
+    print(searched_companies)
     assert [company["company_name"] for company in searched_companies] == [
         "딤딤섬 대구점",
         "마이셀럽스",
