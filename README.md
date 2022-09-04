@@ -35,3 +35,15 @@ FLASK_APP=app.wsgi:create_wsgi_app flask openapi write --format=json docs/apispe
 
 redoc-cli build docs/apispec.json -o docs/index.html
 ```
+
+
+# 프로젝트 빌드
+```
+docker build --no-cache -t wanted-test .
+```
+
+# 프로젝트 실행
+```
+gunicorn -k gevent "run:_create_wsgi_app('prod')" -b 127.0.0.1:9999
+python run.py --env prod
+```
