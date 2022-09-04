@@ -24,13 +24,16 @@ api = Blueprint("company", __name__, url_prefix="/")
 
 @api.route("/companies")
 class Companies(MethodView):
-    def get(self):
-        companies = company_service().get_all()
-        return companies
-
     @api.arguments(schema=NewCompanySchema)
-    @api.response(200, CompanySchema)
+    @api.response(status_code=200, schema=CompanySchema)
     def post(self, new_company):
+        """회사 정보 추가
+
+        한 회사의 각 나라별 이름과 태그 정보를 일괄 등록합니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
         names = new_company["company_name"]
         tags = new_company["tags"]
@@ -67,6 +70,13 @@ class CompaniesByname(MethodView):
     @api.arguments(schema=CompanyNameSchema, location="path", as_kwargs=True)
     @api.response(200, CompanySchema)
     def get(self, **path_parameter):
+        """회사 정보 조회
+
+        회사명으로 회사정보를 조회합니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
         company_name = path_parameter["company_name"]
         try:
@@ -77,6 +87,11 @@ class CompaniesByname(MethodView):
 
     @api.response(200)
     def delete(self, company_name):
+        """회사 정보 삭제
+
+        회사명과 일치하는 정보를 삭제합니다.
+        ---
+        """
         company_service().delete_company_by_name(name=company_name)
         return {"result": "success"}
 
@@ -84,7 +99,16 @@ class CompaniesByname(MethodView):
 @api.route("/search")
 class SearchCompanies(MethodView):
     @api.arguments(CompanyQueryArgsSchema, location="query")
+    @api.response(200, CompanySchema)
     def get(self, query_args):
+        """회사 검색
+
+        입력한 단어가 회사명에 포함된 회사를 검색합니다.
+        자동완성 검색에 사용됩니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
         query = query_args["query"]
         try:
@@ -96,9 +120,28 @@ class SearchCompanies(MethodView):
 
 @api.route("/companies/<string:company_name>/tags")
 class CompanyTags(MethodView):
-    @api.arguments(schema=NewTagSchema(many=True))
+    @api.arguments(
+        schema=NewTagSchema(many=True),
+        example=[
+            {
+                "tag_name": {
+                    "ko": "태그_4",
+                    "tw": "tag_4",
+                    "en": "tag_4",
+                }
+            },
+        ],
+    )
     @api.arguments(schema=CompanyNameSchema, location="path", as_kwargs=True)
+    @api.response(200, CompanySchema)
     def put(self, tags, company_name):
+        """태그 추가
+
+        회사 정보에 다수의 태그를 추가합니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
 
         company_tags = []
@@ -123,7 +166,17 @@ class CompanyTags(MethodView):
 @api.route("/companies/<string:company_name>/tags/<string:tag_name>")
 class CompanyTagByName(MethodView):
     @api.arguments(schema=CompanyTagDeleteSchema, location="path", as_kwargs=True)
+    @api.response(200, CompanySchema)
     def delete(self, company_name, tag_name):
+        """태그 삭제
+
+        태그와 회사명이 일차하는 태그 정보를 삭제합니다.
+        태그 추가를 `태그_4`, `tag_4`, `タグ_4` 와 같이했다면
+        `태그_4` 삭제시 모두 삭제됩니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
         try:
             company_data = company_service().delete_company_tag(
@@ -140,7 +193,16 @@ class CompanyTagByName(MethodView):
 @api.route("/tags")
 class CompanyTagByTag(MethodView):
     @api.arguments(CompanyQueryArgsSchema, location="query")
+    @api.response(200, CompanySchema)
     def get(self, query_args):
+        """태그로 회사 검색
+
+        태그가 포함된 회사를 검색합니다.
+        `/tags?query=word` 와 같이 검색어를 전달해야 합니다.<br>
+        headers에 `{'x-wanted-language': 'ko' }`와 같이 
+        요청 언어정보가 포함되어야 합니다.
+        ---
+        """
         response_language = request.headers.get("X-Wanted-Language")
         tag_name = query_args["query"]
         try:

@@ -1,16 +1,6 @@
 {
   "paths": {
     "/companies": {
-      "get": {
-        "responses": {
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "tags": [
-          "company"
-        ]
-      },
       "post": {
         "responses": {
           "422": {
@@ -40,6 +30,8 @@
             }
           }
         },
+        "summary": "\ud68c\uc0ac \uc815\ubcf4 \ucd94\uac00",
+        "description": "\ud55c \ud68c\uc0ac\uc758 \uac01 \ub098\ub77c\ubcc4 \uc774\ub984\uacfc \ud0dc\uadf8 \uc815\ubcf4\ub97c \uc77c\uad04 \ub4f1\ub85d\ud569\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -52,6 +44,7 @@
             "in": "path",
             "name": "company_name",
             "required": true,
+            "description": "\ud68c\uc0ac\uba85",
             "schema": {
               "type": "string"
             }
@@ -75,6 +68,8 @@
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
+        "summary": "\ud68c\uc0ac \uc815\ubcf4 \uc870\ud68c",
+        "description": "\ud68c\uc0ac\uba85\uc73c\ub85c \ud68c\uc0ac\uc815\ubcf4\ub97c \uc870\ud68c\ud569\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -88,6 +83,8 @@
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
+        "summary": "\ud68c\uc0ac \uc815\ubcf4 \uc0ad\uc81c",
+        "description": "\ud68c\uc0ac\uba85\uacfc \uc77c\uce58\ud558\ub294 \uc815\ubcf4\ub97c \uc0ad\uc81c\ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -111,6 +108,7 @@
             "in": "query",
             "name": "query",
             "required": true,
+            "description": "\ud68c\uc0ac\uba85 \ub610\ub294 \ud0dc\uadf8",
             "schema": {
               "type": "string"
             }
@@ -120,10 +118,22 @@
           "422": {
             "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
+          },
           "default": {
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
+        "summary": "\ud68c\uc0ac \uac80\uc0c9",
+        "description": "\uc785\ub825\ud55c \ub2e8\uc5b4\uac00 \ud68c\uc0ac\uba85\uc5d0 \ud3ec\ud568\ub41c \ud68c\uc0ac\ub97c \uac80\uc0c9\ud569\ub2c8\ub2e4.\n\uc790\ub3d9\uc644\uc131 \uac80\uc0c9\uc5d0 \uc0ac\uc6a9\ub429\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -136,6 +146,7 @@
             "in": "path",
             "name": "company_name",
             "required": true,
+            "description": "\ud68c\uc0ac\uba85",
             "schema": {
               "type": "string"
             }
@@ -144,6 +155,16 @@
         "responses": {
           "422": {
             "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
           },
           "default": {
             "$ref": "#/components/responses/DEFAULT_ERROR"
@@ -158,10 +179,21 @@
                 "items": {
                   "$ref": "#/components/schemas/NewTag"
                 }
-              }
+              },
+              "example": [
+                {
+                  "tag_name": {
+                    "ko": "\ud0dc\uadf8_4",
+                    "tw": "tag_4",
+                    "en": "tag_4"
+                  }
+                }
+              ]
             }
           }
         },
+        "summary": "\ud0dc\uadf8 \ucd94\uac00",
+        "description": "\ud68c\uc0ac \uc815\ubcf4\uc5d0 \ub2e4\uc218\uc758 \ud0dc\uadf8\ub97c \ucd94\uac00\ud569\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -185,6 +217,7 @@
             "in": "path",
             "name": "company_name",
             "required": true,
+            "description": "\ud68c\uc0ac\uba85",
             "schema": {
               "type": "string"
             }
@@ -193,6 +226,7 @@
             "in": "path",
             "name": "tag_name",
             "required": true,
+            "description": "\uc0ad\uc81c\ud560 \ud0dc\uadf8",
             "schema": {
               "type": "string"
             }
@@ -202,10 +236,22 @@
           "422": {
             "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
+          },
           "default": {
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
+        "summary": "\ud0dc\uadf8 \uc0ad\uc81c",
+        "description": "\ud0dc\uadf8\uc640 \ud68c\uc0ac\uba85\uc774 \uc77c\ucc28\ud558\ub294 \ud0dc\uadf8 \uc815\ubcf4\ub97c \uc0ad\uc81c\ud569\ub2c8\ub2e4.\n\ud0dc\uadf8 \ucd94\uac00\ub97c `\ud0dc\uadf8_4`, `tag_4`, `\u30bf\u30b0_4` \uc640 \uac19\uc774\ud588\ub2e4\uba74\n`\ud0dc\uadf8_4` \uc0ad\uc81c\uc2dc \ubaa8\ub450 \uc0ad\uc81c\ub429\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -238,6 +284,7 @@
             "in": "query",
             "name": "query",
             "required": true,
+            "description": "\ud68c\uc0ac\uba85 \ub610\ub294 \ud0dc\uadf8",
             "schema": {
               "type": "string"
             }
@@ -247,10 +294,22 @@
           "422": {
             "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
+          },
           "default": {
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
+        "summary": "\ud0dc\uadf8\ub85c \ud68c\uc0ac \uac80\uc0c9",
+        "description": "\ud0dc\uadf8\uac00 \ud3ec\ud568\ub41c \ud68c\uc0ac\ub97c \uac80\uc0c9\ud569\ub2c8\ub2e4.\n`/tags?query=word` \uc640 \uac19\uc774 \uac80\uc0c9\uc5b4\ub97c \uc804\ub2ec\ud574\uc57c \ud569\ub2c8\ub2e4.<br>\nheaders\uc5d0 `{'x-wanted-language': 'ko' }`\uc640 \uac19\uc774\n\uc694\uccad \uc5b8\uc5b4\uc815\ubcf4\uac00 \ud3ec\ud568\ub418\uc5b4\uc57c \ud569\ub2c8\ub2e4.",
         "tags": [
           "company"
         ]
@@ -273,21 +332,21 @@
       "Error": {
         "type": "object",
         "properties": {
-          "errors": {
-            "type": "object",
-            "description": "Errors"
-          },
-          "message": {
-            "type": "string",
-            "description": "Error message"
-          },
           "code": {
             "type": "integer",
             "description": "Error code"
           },
+          "errors": {
+            "type": "object",
+            "description": "Errors"
+          },
           "status": {
             "type": "string",
             "description": "Error name"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
           }
         }
       },
@@ -320,19 +379,26 @@
       "NewCompany": {
         "type": "object",
         "properties": {
-          "company_name": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
           "tags": {
             "type": "array",
+            "description": "\uc5ec\ub7ec \uc5b8\uc5b4\uc758 \ud0dc\uadf8",
             "items": {
               "type": "object",
               "additionalProperties": {
                 "type": "object"
               }
+            }
+          },
+          "company_name": {
+            "type": "object",
+            "description": "\uc5ec\ub7ec \uc5b8\uc5b4\uc758 \ud68c\uc0ac\uba85",
+            "example": {
+              "ko": "\ub77c\uc778 \ud504\ub808\uc26c",
+              "tw": "LINE FRESH",
+              "en": "LINE FRESH"
+            },
+            "additionalProperties": {
+              "type": "string"
             }
           }
         },
@@ -344,14 +410,22 @@
       "Company": {
         "type": "object",
         "properties": {
-          "company_name": {
-            "type": "string"
-          },
           "tags": {
             "type": "array",
+            "description": "\ud0dc\uadf8 \ubaa9\ub85d",
+            "example": [
+              "\ud0dc\uadf8_1",
+              "\ud0dc\uadf8_8",
+              "\ud0dc\uadf8_15"
+            ],
             "items": {
               "type": "string"
             }
+          },
+          "company_name": {
+            "type": "string",
+            "description": "\ud68c\uc0ac\uba85",
+            "example": "\ub77c\uc778\ud504\ub808\uc26c"
           }
         },
         "required": [
@@ -364,6 +438,7 @@
         "properties": {
           "tag_name": {
             "type": "object",
+            "description": "\ucd94\uac00\ud560 \ud0dc\uadf8",
             "additionalProperties": {
               "type": "string"
             }
@@ -375,8 +450,8 @@
       }
     },
     "responses": {
-      "DEFAULT_ERROR": {
-        "description": "Default error response",
+      "UNPROCESSABLE_ENTITY": {
+        "description": "Unprocessable Entity",
         "content": {
           "application/json": {
             "schema": {
@@ -385,8 +460,8 @@
           }
         }
       },
-      "UNPROCESSABLE_ENTITY": {
-        "description": "Unprocessable Entity",
+      "DEFAULT_ERROR": {
+        "description": "Default error response",
         "content": {
           "application/json": {
             "schema": {
