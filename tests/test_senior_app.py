@@ -43,8 +43,8 @@ def test_company_search(api):
         "company_name": "원티드랩",
         "tags": [
             "태그_4",
-            "태그_20",
             "태그_16",
+            "태그_20",
         ],
     }
 
@@ -132,6 +132,17 @@ def test_new_tag(api):
     5.  회사 태그 정보 추가
     저장 완료후 header의 x-wanted-language 언어값에 따라 해당 언어로 출력되어야 합니다.
     """
+    # 이미 원트드랩에 추가된 태그들
+    # ko 태그_4|태그_20|태그_16
+    # en tag_4|tag_20|tag_16
+    # jp タグ_4|タグ_20|タグ_16
+
+    # 테스트 데이터 추가후
+    # ko 태그_4|태그_20|태그_16|태그_50
+    # en tag_4|tag_20|tag_16|tag_50
+    # jp タグ_4|タグ_20|タグ_16|タグ_50
+    # tw tag_4
+
     resp = api.put(
         "/companies/원티드랩/tags",
         json=[
@@ -170,6 +181,24 @@ def test_delete_tag(api):
     6.  회사 태그 정보 삭제
     저장 완료후 header의 x-wanted-language 언어값에 따라 해당 언어로 출력되어야 합니다.
     """
+
+    # 이미 원트드랩에 추가된 태그들
+    # ko 태그_4|태그_20|태그_16
+    # en tag_4|tag_20|tag_16
+    # jp タグ_4|タグ_20|タグ_16
+
+    # 테스트 test_new_tag 진행 후
+    # ko 태그_4|태그_20|태그_16|태그_50
+    # en tag_4|tag_20|tag_16|tag_50
+    # jp タグ_4|タグ_20|タグ_16|タグ_50
+    # tw tag_4
+
+    # 테스트 test_new_tag 진행 후
+    # ko 태그_4|태그_20|태그_50
+    # en tag_4|tag_20|tag_50
+    # jp タグ_4|タグ_20|タグ_50
+    # tw tag_4
+
     resp = api.delete(
         "/companies/원티드랩/tags/태그_16",
         headers=[("x-wanted-language", "en")],
