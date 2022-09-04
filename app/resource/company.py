@@ -42,7 +42,10 @@ class Companies(MethodView):
         company_tags = []
         for tag in tags:
             for language, name in tag["tag_name"].items():
-                company_tags.append(CompanyTagDTO(language=language, name=name))
+                group_id = int(name.split("_")[-1])
+                company_tags.append(
+                    CompanyTagDTO(language=language, name=name, group_id=group_id)
+                )
 
         try:
             company_data = company_service().add_commany(
@@ -69,7 +72,7 @@ class CompaniesByname(MethodView):
         try:
             company_data = company_service().get_commany_by_name(name=company_name)
         except NotFoundCompany:
-            abort(400, message=f"can not found comapny {company_name}")
+            abort(404, message=f"can not found comapny {company_name}")
         return company_data[response_language]
 
     @api.response(200)
@@ -98,13 +101,16 @@ class SearchCompanies(MethodView):
 class CompanyTags(MethodView):
     @api.arguments(schema=NewTagSchema(many=True))
     @api.arguments(schema=CompanyNameSchema, location="path", as_kwargs=True)
-    def post(self, tags, company_name):
+    def put(self, tags, company_name):
         response_language = request.headers.get("X-Wanted-Language")
 
         company_tags = []
         for tag in tags:
             for language, name in tag["tag_name"].items():
-                company_tags.append(CompanyTagDTO(language=language, name=name))
+                group_id = int(name.split("_")[-1])
+                company_tags.append(
+                    CompanyTagDTO(language=language, name=name, group_id=group_id)
+                )
         try:
             company_data = company_service().add_company_tags(
                 company_name=company_name,
@@ -112,7 +118,7 @@ class CompanyTags(MethodView):
             )
         except DuplicatedTag as e:
             tag_name = e.args[0]
-            abort(400, message=f"can not found comapny {tag_name}")
+            abort(400, message=f"duplicated {tag_name}")
 
         return company_data[response_language]
 
