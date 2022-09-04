@@ -1,4 +1,5 @@
 
+# 프로젝트 기능
 
 - 회사명 자동완성
   - 회사명의 일부만 들어가도 검색이 되어야 합니다.
@@ -13,10 +14,24 @@
 - 회사 태그 정보 삭제
 
 
-
+# 프로젝트 정보
 
 - 코딩 컨벤션 : flake8, black
 - 마이그레이션 관리 : alembic
 - 코드 패키지 관리 : poetry
 - 비즈니스 로직 : 레이어 분리
 - 데이터베이스 : sqlite
+
+
+# API 문서 생성
+- redoc-cli 설치
+```
+npm i -g redoc-cli
+```
+
+- 문서 추출 후 렌더링
+```
+FLASK_APP=app.wsgi:create_wsgi_app flask openapi write --format=json docs/apispec.json
+
+redoc-cli build docs/apispec.json -o docs/index.html
+```
