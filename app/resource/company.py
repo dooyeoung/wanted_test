@@ -85,16 +85,13 @@ class CompaniesByname(MethodView):
 class SearchCompanies(MethodView):
     @api.arguments(CompanyQueryArgsSchema, location="query")
     def get(self, query_args):
-        language = request.headers.get("X-Wanted-Language")
+        response_language = request.headers.get("X-Wanted-Language")
         query = query_args["query"]
         try:
-            company_names = company_service().search_commany_by_query(
-                query=query,
-                language=language,
-            )
+            company_names = company_service().get_commanies_by_name_query(query=query)
         except NotFoundCompany:
             abort(400, message=f"can not found comapny {query}")
-        return company_names
+        return company_names[response_language]
 
 
 @api.route("/companies/<string:company_name>/tags")
@@ -138,3 +135,18 @@ class CompanyTagByName(MethodView):
             abort(400, message=f"not found tag {tag_name} of {company_name}")
 
         return company_data[response_language]
+
+
+@api.route("/tags")
+class CompanyTagByTag(MethodView):
+    @api.arguments(CompanyQueryArgsSchema, location="query")
+    def get(self, query_args):
+        response_language = request.headers.get("X-Wanted-Language")
+        tag_name = query_args["query"]
+        try:
+            company_names = company_service().get_commanies_by_tag(
+                tag_name=tag_name,
+            )
+        except NotFoundCompany:
+            abort(400, message=f"can not found comapny {tag_name}")
+        return company_names[response_language]
