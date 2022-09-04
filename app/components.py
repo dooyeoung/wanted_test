@@ -1,5 +1,7 @@
-from flask import current_app
 import functools
+
+from flask import current_app
+
 from app.repository.commany import SQLAlchemyCompanyRepository
 from app.service.company import CompanyService
 from app.orm import database_sessionmaker
