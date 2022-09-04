@@ -123,7 +123,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyName"
+                  }
                 }
               }
             }
@@ -299,7 +302,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyName"
+                  }
                 }
               }
             }
@@ -340,13 +346,13 @@
             "type": "object",
             "description": "Errors"
           },
-          "status": {
-            "type": "string",
-            "description": "Error name"
-          },
           "message": {
             "type": "string",
             "description": "Error message"
+          },
+          "status": {
+            "type": "string",
+            "description": "Error name"
           }
         }
       },
@@ -379,16 +385,6 @@
       "NewCompany": {
         "type": "object",
         "properties": {
-          "tags": {
-            "type": "array",
-            "description": "\uc5ec\ub7ec \uc5b8\uc5b4\uc758 \ud0dc\uadf8",
-            "items": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              }
-            }
-          },
           "company_name": {
             "type": "object",
             "description": "\uc5ec\ub7ec \uc5b8\uc5b4\uc758 \ud68c\uc0ac\uba85",
@@ -400,6 +396,16 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "tags": {
+            "type": "array",
+            "description": "\uc5ec\ub7ec \uc5b8\uc5b4\uc758 \ud0dc\uadf8",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            }
           }
         },
         "required": [
@@ -410,6 +416,11 @@
       "Company": {
         "type": "object",
         "properties": {
+          "company_name": {
+            "type": "string",
+            "description": "\ud68c\uc0ac\uba85",
+            "example": "\ub77c\uc778\ud504\ub808\uc26c"
+          },
           "tags": {
             "type": "array",
             "description": "\ud0dc\uadf8 \ubaa9\ub85d",
@@ -421,16 +432,23 @@
             "items": {
               "type": "string"
             }
-          },
-          "company_name": {
-            "type": "string",
-            "description": "\ud68c\uc0ac\uba85",
-            "example": "\ub77c\uc778\ud504\ub808\uc26c"
           }
         },
         "required": [
           "company_name",
           "tags"
+        ]
+      },
+      "CompanyName": {
+        "type": "object",
+        "properties": {
+          "company_name": {
+            "type": "string",
+            "description": "\ud68c\uc0ac\uba85"
+          }
+        },
+        "required": [
+          "company_name"
         ]
       },
       "NewTag": {

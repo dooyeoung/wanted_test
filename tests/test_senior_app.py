@@ -1,19 +1,4 @@
-import pytest
 import json
-
-from app.wsgi import create_wsgi_app
-
-
-@pytest.fixture
-def fx_wsgi_app():
-    app = create_wsgi_app()
-    app.config.from_object("app.config.TestConfig")
-    return app
-
-
-@pytest.fixture
-def api(fx_wsgi_app):
-    return fx_wsgi_app.test_client()
 
 
 def test_company_name_autocomplete(api):
@@ -120,7 +105,6 @@ def test_search_tag_name(api):
     resp = api.get("/tags?query=タグ_22", headers=[("x-wanted-language", "ko")])
     searched_companies = json.loads(resp.data.decode("utf-8"))
 
-    print(searched_companies)
     assert [company["company_name"] for company in searched_companies] == [
         "딤딤섬 대구점",
         "마이셀럽스",
