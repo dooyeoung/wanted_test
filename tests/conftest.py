@@ -2,7 +2,7 @@ import pytest
 import csv
 
 from app.wsgi import create_wsgi_app
-from app.orm import Base, database_engine, session_scope
+from app.orm import Base, database_engine
 from app.components import company_service
 from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
 
