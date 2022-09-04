@@ -11,3 +11,4 @@ class CompanyNameDTO:
 class CompanyTagDTO:
     name: str
     language: str
+    group_id: int
