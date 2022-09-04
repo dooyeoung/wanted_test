@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import String
+from sqlalchemy.types import String, Integer
 from sqlalchemy_utc.sqltypes import UtcDateTime
 from sqlalchemy_utils.types.uuid import UUIDType
 
@@ -28,7 +28,7 @@ class CompanyName(Base):
     language = Column(String(length=2), nullable=False)
 
     def __repr__(self) -> str:
-        return f"{str(self.uuid), str(self.company_uuid), self.name, self.language}"
+        return f"{str(self.uuid)} {str(self.company_uuid)} {self.name} {self.language}"
 
 
 class CompanyTag(Base):
@@ -36,8 +36,9 @@ class CompanyTag(Base):
 
     uuid = Column(UUIDType, primary_key=True, default=uuid.uuid4)
     company_uuid = Column(UUIDType, ForeignKey("company.uuid", ondelete="CASCADE"))
+    group_id = Column(Integer)
     name = Column(String(length=20), nullable=False)
     language = Column(String(length=2), nullable=False)
 
     def __repr__(self) -> str:
-        return f"{str(self.uuid), str(self.company_uuid), self.name, self.language}"
+        return f"{str(self.uuid)} {str(self.company_uuid)} {self.group_id} {self.name} {self.language}"  # noqa

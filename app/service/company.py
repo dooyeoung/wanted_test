@@ -8,7 +8,6 @@ from app.service.dto.company import CompanyNameDTO, CompanyTagDTO
 from app.exception import (
     DuplicatedName,
     NotFoundCompany,
-    DuplicatedTag,
     NotFoundCompanyTag,
 )
 
@@ -50,7 +49,8 @@ class CompanyService:
             company_data[name.language]["company_name"] = name.name
             company_data[name.language]["tags"] = []
 
-        for tag in company.tags:
+        sorted_tags = sorted(company.tags, key=lambda tag: tag.group_id)
+        for tag in sorted_tags:
             if not company_data[tag.language]:
                 company_data[tag.language]["tags"] = []
 
@@ -78,12 +78,15 @@ class CompanyService:
                 session.add(name)
 
             for tag_dto in tags:
-                tag = CompanyTag(language=tag_dto.language, name=tag_dto.name)
+                tag = CompanyTag(
+                    language=tag_dto.language,
+                    name=tag_dto.name,
+                    group_id=tag_dto.group_id,
+                )
                 company.tags.append(tag)
                 session.add(tag)
 
-            language_company_data = self._serialize_company(company)
-            return language_company_data
+            return self._serialize_company(company)
 
     def get_commany_by_name(
         self,
@@ -99,9 +102,7 @@ class CompanyService:
                 raise NotFoundCompany(name)
 
             company = company_name.company
-            language_company_data = self._serialize_company(company)
-
-            return language_company_data
+            return self._serialize_company(company)
 
     def search_commany_by_query(
         self,
@@ -155,9 +156,13 @@ class CompanyService:
                         company_tags,
                     )
                 ):
-                    raise DuplicatedTag(tag_dto.name)
+                    continue
 
-                tag = CompanyTag(language=tag_dto.language, name=tag_dto.name)
+                tag = CompanyTag(
+                    language=tag_dto.language,
+                    name=tag_dto.name,
+                    group_id=tag_dto.group_id,
+                )
                 company.tags.append(tag)
                 session.add(tag)
 
@@ -165,14 +170,20 @@ class CompanyService:
 
     def delete_company_tag(self, company_name: str, tag_name: str) -> dict:
         with session_scope(self.sessionmaker) as session:
-            company_tag = self.company_repository.get_commany_tag_by_name_and_tag(
-                session=session,
-                company_name=company_name,
-                tag_name=tag_name,
+            company_tags = (
+                self.company_repository.get_commany_tag_group_by_name_and_tag(
+                    session=session,
+                    company_name=company_name,
+                    tag_name=tag_name,
+                )
             )
-            if not company_tag:
+            if not company_tags:
                 raise NotFoundCompanyTag(tag_name)
 
-            company = company_tag.company
-            session.delete(company_tag)
+            company = None
+            for tag in company_tags:
+                if not company:
+                    company = tag.company
+
+                session.delete(tag)
             return self._serialize_company(company=company)

@@ -6,7 +6,13 @@ Create Date: 2022-09-03 11:19:12.098119
 
 """
 from alembic import op
-from sqlalchemy import Column, ForeignKeyConstraint, PrimaryKeyConstraint, String
+from sqlalchemy import (
+    Column,
+    ForeignKeyConstraint,
+    PrimaryKeyConstraint,
+    String,
+    Integer,
+)
 from sqlalchemy_utils.types.uuid import UUIDType
 
 
@@ -22,6 +28,7 @@ def upgrade() -> None:
         "company_tag",
         Column("uuid", UUIDType(), nullable=False),
         Column("company_uuid", UUIDType(), nullable=False),
+        Column("group_id", Integer(), nullable=False),
         Column("name", String(length=20), nullable=False),
         Column("language", String(length=2), nullable=False),
         ForeignKeyConstraint(
